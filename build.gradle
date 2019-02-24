@@ -34,15 +34,17 @@ repositories {
 
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('com.zaxxer:HikariCP:3.1.0')
+	//compile('org.springframework.boot:spring-boot-starter')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
+	compile('com.zaxxer:HikariCP:3.3.1')
 	compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
 	compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
 	compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.2'
 	compile group: 'com.alibaba', name: 'druid', version: '1.1.10'
 	compile ('io.dropwizard.metrics:metrics-core:3.2.6')
 	compile ('io.dropwizard.metrics:metrics-healthchecks')
+	compile group: 'org.apache.rocketmq', name: 'rocketmq-client', version: '4.4.0'
+
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

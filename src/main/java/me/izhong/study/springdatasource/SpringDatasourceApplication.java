@@ -7,7 +7,7 @@ import com.codahale.metrics.health.HealthCheckRegistry;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.catalina.startup.Tomcat;
+//import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -37,12 +37,12 @@ import java.util.stream.Stream;
 @SpringBootApplication
 public class SpringDatasourceApplication {
 
-//    private static ExecutorService executorService = Executors.newFixedThreadPool(200);
+    private static ExecutorService executorService = Executors.newFixedThreadPool(200);
     private static transient boolean run = true;
-//    @Autowired
-//    private DataSource dataSource;
+    @Autowired
+    private DataSource dataSource;
 
-//    private AtomicInteger count = new AtomicInteger(0);
+    private AtomicInteger count = new AtomicInteger(0);
 //    private static MetricRegistry metrics = new MetricRegistry();
 //    private static HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
 
@@ -63,10 +63,10 @@ public class SpringDatasourceApplication {
         System.out.println("slog done:");
     }
 
-    //@PostConstruct
+    @PostConstruct
     public void testInsert() {
 
-       /* Runnable tpsr = () -> {
+        Runnable tpsr = () -> {
             int last = 0;
             while (run) {
                 int current = count.get();
@@ -109,7 +109,7 @@ public class SpringDatasourceApplication {
             }
         };
 
-        executorService.submit(tpsr);*/
+       // executorService.submit(tpsr);
 
 
 
@@ -129,8 +129,8 @@ public class SpringDatasourceApplication {
 
 
 
-        /*System.out.println("dataSource is:" + dataSource.getClass().getName());
-        for (int i = 0; i < 5; i++) {
+        System.out.println("dataSource is:" + dataSource.getClass().getName());
+        for (int i = 0; i < 1; i++) {
             Runnable c1 = () -> {
                 while (run) {
                     Connection connection = null;
@@ -144,6 +144,7 @@ public class SpringDatasourceApplication {
                         //ps = connection.prepareStatement("insert into users values (?,?,?,?)");
 
                         ps = connection.createStatement();
+                        ps.setQueryTimeout(3);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -151,6 +152,7 @@ public class SpringDatasourceApplication {
                     try {
 
                         int id = count.getAndIncrement();
+                        System.out.println("count:" + id);
                         if (ps == null) {
                             System.out.println("ps is null " + Thread.currentThread().getName());
                             //break;
@@ -166,18 +168,24 @@ public class SpringDatasourceApplication {
 //                            //System.out.println("count:" + id);
 //                        }
 
-                        ResultSet rs  = ps.executeQuery("select * from users limit 2,3");
+                        System.out.println("being query:");
+
+                        ResultSet rs  = ps.executeQuery("select * from users for update");
 
                         while (rs.next()){
                             long uid = rs.getInt(1);
                             String name = rs.getString(2);
-                            //System.out.println("uid:" + uid + "  name:" + name);
+                            System.out.println("uid:" + uid + "  name:" + name);
                         }
                         connection.commit();
                         //ps.close();
                     } catch (Exception e) {
                         e.printStackTrace();
-
+                        try {
+                            connection.rollback();
+                        } catch (SQLException e1) {
+                            e1.printStackTrace();
+                        }
                     } finally {
 
 
@@ -185,6 +193,11 @@ public class SpringDatasourceApplication {
                     try {
                         connection.close();
                     } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
@@ -203,7 +216,7 @@ public class SpringDatasourceApplication {
         run = false;
         System.out.println("start down...:");
         executorService.shutdown();
-        System.out.println("total count:" + count.get());*/
+        System.out.println("total count:" + count.get());
     }
 
 
@@ -246,7 +259,7 @@ public class SpringDatasourceApplication {
         return dataSource;
     }
 
-
+*/
     @ConditionalOnMissingBean(DataSource.class)
     @Bean()
     public HikariDataSource dataSource() {
@@ -262,10 +275,10 @@ public class SpringDatasourceApplication {
         config.setMaximumPoolSize(12);
         config.setConnectionTimeout(17000);
         config.setPoolName("poll-online");
-        config.setMetricsTrackerFactory(new InfluxDBMetricsTrackerFactory());
+        //config.setMetricsTrackerFactory(new InfluxDBMetricsTrackerFactory());
         //config.setHealthCheckRegistry(healthCheckRegistry);
         HikariDataSource ds = new HikariDataSource(config);
 
         return ds;
-    }*/
+    }
 }
