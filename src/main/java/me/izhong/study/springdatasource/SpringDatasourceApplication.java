@@ -42,6 +42,8 @@ public class SpringDatasourceApplication {
     @Autowired
     private DataSource dataSource;
 
+
+
     private AtomicInteger count = new AtomicInteger(0);
 //    private static MetricRegistry metrics = new MetricRegistry();
 //    private static HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
@@ -50,20 +52,22 @@ public class SpringDatasourceApplication {
         SpringApplication.run(SpringDatasourceApplication.class, args);
     }
 
-    @Bean
-    public ServletWebServerFactory servletWebServerFactory(){
-        TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory();
-        tomcatServletWebServerFactory.setPort(3300);
-        tomcatServletWebServerFactory.setBaseDirectory(new File("/"));
-        return tomcatServletWebServerFactory;
-    }
+//    @Bean
+//    public ServletWebServerFactory servletWebServerFactory(){
+//        TomcatServletWebServerFactory tomcatServletWebServerFactory = new TomcatServletWebServerFactory();
+//        tomcatServletWebServerFactory.setPort(3300);
+//        tomcatServletWebServerFactory.setBaseDirectory(new File("/"));
+//        return tomcatServletWebServerFactory;
+//    }
+
+
 
     @PostConstruct
     public void testPost(){
         System.out.println("slog done:");
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void testInsert() {
 
         Runnable tpsr = () -> {
@@ -130,7 +134,7 @@ public class SpringDatasourceApplication {
 
 
         System.out.println("dataSource is:" + dataSource.getClass().getName());
-        for (int i = 0; i < 1; i++) {
+        /*for (int i = 0; i < 1; i++) {
             Runnable c1 = () -> {
                 while (run) {
                     Connection connection = null;
@@ -144,7 +148,7 @@ public class SpringDatasourceApplication {
                         //ps = connection.prepareStatement("insert into users values (?,?,?,?)");
 
                         ps = connection.createStatement();
-                        ps.setQueryTimeout(3);
+                        ps.setQueryTimeout(5);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -204,7 +208,7 @@ public class SpringDatasourceApplication {
             };
             System.out.println("connection established " + i);
             executorService.submit(c1);
-        }
+        }*/
 
 
         try {
@@ -245,9 +249,9 @@ public class SpringDatasourceApplication {
         dataSource.setMaxPoolSize(600);
         return dataSource;
     }
-
-    @ConditionalOnProperty("druid")
-    @Bean
+*/
+    //@ConditionalOnProperty("druid")
+    //@Bean
     public DataSource dataSourceDruid() throws Exception {
 
         DruidDataSource dataSource = new DruidDataSource();
@@ -259,7 +263,7 @@ public class SpringDatasourceApplication {
         return dataSource;
     }
 
-*/
+
     @ConditionalOnMissingBean(DataSource.class)
     @Bean()
     public HikariDataSource dataSource() {
@@ -272,9 +276,14 @@ public class SpringDatasourceApplication {
         //props.put("dataSource.logWriter", new PrintWriter(System.out));
 
         HikariConfig config = new HikariConfig(props);
-        config.setMaximumPoolSize(12);
+        config.setMaximumPoolSize(1);
         config.setConnectionTimeout(17000);
         config.setPoolName("poll-online");
+
+        Properties properties = new Properties();
+        //properties.setProperty("socketTimeout","3000");
+        properties.setProperty("tcpKeepAlive","true");
+        config.setDataSourceProperties(properties);
         //config.setMetricsTrackerFactory(new InfluxDBMetricsTrackerFactory());
         //config.setHealthCheckRegistry(healthCheckRegistry);
         HikariDataSource ds = new HikariDataSource(config);

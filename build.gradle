@@ -36,7 +36,9 @@ repositories {
 dependencies {
 	//compile('org.springframework.boot:spring-boot-starter')
 	compile('org.springframework.boot:spring-boot-starter-webflux')
+    compile('org.springframework.boot:spring-boot-starter-jdbc')
 	compile('com.zaxxer:HikariCP:3.3.1')
+	compile('org.projectlombok:lombok:1.16.22')
 	compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
 	compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
 	compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.2'
